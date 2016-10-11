@@ -8,11 +8,11 @@ This is a work on progress, don't use it on production.
 
 ### You have this workbook. 
 
-  | A | B | C | D
+.  | A  | B  | C  | D
 -- | -- | -- | -- | -- 
-1 | name | Last major version | Initial Launch Date | Last version | Other data  
-2 | Java | 8 | 2014-03-18 | 8.101 | xxx
-3 | Kotlin | 1 | 2016-09-22 | 1.04 | xxx
+1  | name | Last major version | Initial Launch Date | Last version | Other data  
+2  | Java | 8 | 2014-03-18 | 8.101 | xxx
+3  | Kotlin | 1 | 2016-09-22 | 1.04 | xxx
 
 ### Choose your columns and write them on a tabular class... 
 ```java
