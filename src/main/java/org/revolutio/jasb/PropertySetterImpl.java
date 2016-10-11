@@ -31,6 +31,10 @@ class PropertySetterImpl implements PropertySetter {
 			o = (int) Double.parseDouble(value);
 		}
 
+		if (type.equals(Double.TYPE)) {
+			o = Double.parseDouble(value);
+		}
+
 		if (type.equals(String.class)) {
 			o = value;
 		}

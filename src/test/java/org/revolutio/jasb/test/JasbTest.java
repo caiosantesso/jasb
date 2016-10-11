@@ -70,7 +70,7 @@ public class JasbTest {
 		jasb.load(notFilePath, null);
 	}
 
-	@Test
+	@Test @Ignore
 	public void shouldThrowExceptionBecausePathIsNotReadable() {
 		Jasb jasb = JasbBuilder.getInstance().build();
 		exception.expect(IllegalArgumentException.class);
