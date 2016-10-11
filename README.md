@@ -6,15 +6,15 @@ JASB is an API that reads workbooks on XLS or XLSX file format and instantiate a
 This is a work on progress, don't use it on production.
 
 
-### You have this workbook. 
+### You have this awful workbook. 
 
-.  | A  | B  | C  | D
--- | -- | -- | -- | -- 
-1  | name | Last major version | Initial Launch Date | Last version | Other data  
-2  | Java | 8 | 2014-03-18 | 8.101 | xxx
-3  | Kotlin | 1 | 2016-09-22 | 1.04 | xxx
+|    | A      | B     | C     | D
+|--- | ---    | :---: | :---: | --- 
+|1   | **name**   | **Last major version** | **Initial Launch Date** | **Last version** | **Other data**
+|2   | Java   | 8                  | 2014-03-18          | 8.101 | xxx
+|3   | Kotlin | 1                  | 2016-09-22          | 1.04 | xxx
 
-### Choose your columns and write them on a tabular class... 
+### Choose your columns and write them on a tabular class.
 ```java
 @Table
 public class Language {
@@ -42,4 +42,5 @@ public static void main(String... args) {
 }
 ```
 ### And you'll get this.
-    {2=Language [name= Java  8, Launch Date=2014-03-18, Last Version=8.101], 3=Language [name= Kotlin  1, Launch Date=2016-09-22, Last Version=1.04]}
+    {2=Language [name= Java  8, Launch Date=2014-03-18, Last Version=8.101], 
+    3=Language [name= Kotlin  1, Launch Date=2016-09-22, Last Version=1.04]}
