@@ -111,8 +111,7 @@ public class JasbImpl implements Jasb {
 		Map<Integer, T> classes = spreadsheet.stream()
 				.collect(Collectors.toMap(row -> row.getRowNumber(), row -> safeNewInstance(tabularClass)));
 
-		spreadsheet
-			.stream()
+		spreadsheet.stream()
 			.flatMap(row -> row.getCells().stream())
 			.filter(cell -> fields.containsKey(cell.getColumnIndex()))
 			.forEach(cell -> setter.set(fields.get(cell.getColumnIndex()), classes.get(cell.getRowNumber()), cell.getValue()));

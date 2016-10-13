@@ -1,11 +1,22 @@
 package org.revolutio.jasb.test;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.AclFileAttributeView;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import static org.junit.Assert.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,13 +43,51 @@ public class JasbTest {
 
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
+
 	private Path validPath = Paths.get("src/test/resources/brasileirao.xlsx");
 	private Path validXlsPath = Paths.get("src/test/resources/brasileirao.xls");
 	private Path notFilePath = Paths.get("src/test/resources/");
-	private Path notReadablePath = Paths.get("src/test/resources/not_readable.xlsx");
 	private Path nonExistentPath = Paths.get("non_existent.xlsx");
 	private Path testsPath = Paths.get("src/test/resources/tests.xlsx");
 	private Path notWorkbookPath = Paths.get("src/test/resources/not_workbook.txt");
+
+	private static Path notReadablePath = Paths.get("src/test/resources/not_readable.xlsx");
+	private static List<AclEntry> acl;
+	private static Set<PosixFilePermission> perms;
+
+	@BeforeClass
+	public static void setUp() {
+		try {
+
+			if (System.getProperty("os.name").contains("Linux")) {
+				perms = Files.getPosixFilePermissions(notReadablePath);
+				Files.setPosixFilePermissions(notReadablePath, Collections.emptySet());
+			} else {
+				AclFileAttributeView attView = Files.getFileAttributeView(notReadablePath, AclFileAttributeView.class);
+				acl = attView.getAcl();
+				attView.setAcl(Collections.emptyList());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	@AfterClass
+	public static void tearDown() {
+		try {
+			
+			if (System.getProperty("os.name").contains("Linux")) {
+				Files.setPosixFilePermissions(notReadablePath, perms);
+			} else {
+
+				AclFileAttributeView attView = Files.getFileAttributeView(notReadablePath, AclFileAttributeView.class);
+				attView.setAcl(acl);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Test
 	public void shouldThrowExceptionBecausePathIsNull() {
@@ -70,7 +119,7 @@ public class JasbTest {
 		jasb.load(notFilePath, null);
 	}
 
-	@Test @Ignore
+	@Test
 	public void shouldThrowExceptionBecausePathIsNotReadable() {
 		Jasb jasb = JasbBuilder.getInstance().build();
 		exception.expect(IllegalArgumentException.class);
@@ -176,7 +225,7 @@ public class JasbTest {
 		Jasb jasb = JasbBuilder.getInstance().build();
 		Map<Integer, RegularTableClass> map = jasb.load(validPath, RegularTableClass.class);
 		System.out.println(map);
-		
+
 	}
 
 	@Test
