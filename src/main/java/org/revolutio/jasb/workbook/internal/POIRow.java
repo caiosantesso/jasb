@@ -42,15 +42,4 @@ class POIRow implements RowWrapper {
 		return row.getRowNum() + 1;
 	}
 
-	@SuppressWarnings("deprecation")
-	@Override
-	public String getValue(int columnIndex) {
-		Cell cell = row.getCell(columnIndex);
-		if (cell.getCellTypeEnum().equals(CellType.FORMULA)) {
-			CellValue value = spreadsheet.getWorkbook().getFormulaEvaluator().evaluate(cell);
-			return value.toString();
-		}
-		return cell.toString();
-	}
-
 }

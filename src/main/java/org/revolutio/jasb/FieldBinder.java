@@ -50,7 +50,8 @@ class FieldBinder {
 	 */
 	Map<Integer, Field> bindFieldsToTableColumns(SpreadsheetWrapper spreadsheet) {
 		if (spreadsheet.isEmpty())
-			throw new SpreadsheetHasNotHeaderException(spreadsheet.getName() + " " + spreadsheet);
+			throw new SpreadsheetHasNotHeaderException(
+					"Spreadsheet " + spreadsheet.getName() + " from workbook " + spreadsheet + " is empty.");
 
 		Map<Integer, Field> bindedFields = new HashMap<>();
 		Set<CellWrapper> headerCells = spreadsheet.getHeader();

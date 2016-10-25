@@ -8,7 +8,4 @@ public interface RowWrapper {
 
 	int getRowNumber();
 
-	String getValue(int columnIndex);
-	
-
 }

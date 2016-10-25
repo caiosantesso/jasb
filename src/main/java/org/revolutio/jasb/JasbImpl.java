@@ -4,12 +4,16 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.revolutio.jasb.annotation.HeaderlessTable;
 import org.revolutio.jasb.annotation.Table;
+import org.revolutio.jasb.workbook.RowWrapper;
 import org.revolutio.jasb.workbook.SpreadsheetWrapper;
 import org.revolutio.jasb.workbook.WorkbookWrapper;
 import org.revolutio.jasb.workbook.internal.Workbooks;
@@ -79,7 +83,7 @@ public class JasbImpl implements Jasb {
 	 */
 	@Override
 	// TODO Verificar se tabularClass está em Cache.
-	public <T> Map<Integer, T> load(Path fromWorkbook, Class<T> tabularClass) {
+	public <T> SortedMap<Integer, T> loadAll(Path fromWorkbook, Class<T> tabularClass) {
 		validatePath(fromWorkbook);
 		Objects.requireNonNull(tabularClass);
 
@@ -92,37 +96,46 @@ public class JasbImpl implements Jasb {
 			throw new IllegalArgumentException(
 					"Can't find spreadsheet " + sheetName + " on workbook " + workbook.getPath());
 
-		FileFormat format = spreadsheet.getFileFormat();
-
 		FieldBinder binder = FieldBinder.newInstance(tabularClass);
-		
+
 		Map<Integer, Field> bindedFields = null;
 		if (isTable)
 			bindedFields = binder.bindFieldsToTableColumns(spreadsheet);
 		else
-			bindedFields = binder.bindFieldsToHeaderlessColumns(format);
+			bindedFields = binder.bindFieldsToHeaderlessColumns(spreadsheet.getFileFormat());
 
 		if (bindedFields.isEmpty())
-			return Collections.emptyMap();
+			return Collections.emptySortedMap();
 
 		Map<Integer, Field> fields = Collections.unmodifiableMap(bindedFields);
 		PropertySetter setter = PropertySetterImpl.newInstance();
 
-		Map<Integer, T> classes = spreadsheet.stream()
-				.collect(Collectors.toMap(row -> row.getRowNumber(), row -> safeNewInstance(tabularClass)));
+		SortedMap<Integer, T> classes = spreadsheet.stream()
+				.collect(Collectors.toMap(RowWrapper::getRowNumber, row -> safeNewInstance(tabularClass), (t1, t2) -> {
+					throw new RuntimeException();
+				}, TreeMap::new));
 
-		spreadsheet.stream()
-			.flatMap(row -> row.getCells().stream())
-			.filter(cell -> fields.containsKey(cell.getColumnIndex()))
-			.forEach(cell -> setter.set(fields.get(cell.getColumnIndex()), classes.get(cell.getRowNumber()), cell.getValue()));
+		spreadsheet.stream().flatMap(row -> row.getCells().stream())
+				.filter(cell -> fields.containsKey(cell.getColumnIndex())).forEach(cell -> setter
+						.set(fields.get(cell.getColumnIndex()), classes.get(cell.getRowNumber()), cell.getValue()));
 
 		return classes;
 	}
 
 	@Override
-	public <T> T load(Path fromWorkbook, Class<T> toTabularClass, int firstRow, int lastRow) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> T loadRelativeRow(Path fromWorkbook, Class<T> toTabularClass, int position) {
+		SortedMap<Integer, T> loadAll = loadAll(fromWorkbook, toTabularClass);
+
+		T t = null;
+		Iterator<T> iterator = loadAll.values().iterator();
+		int i = 0;
+		for (; iterator.hasNext() && i < position; i++)
+			t = iterator.next();
+		
+		if (!iterator.hasNext() && i == --position)
+			return null;
+
+		return t;
 	}
 
 }

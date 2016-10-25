@@ -3,7 +3,7 @@ package org.revolutio.jasb;
 import org.revolutio.jasb.annotation.Column;
 import org.revolutio.jasb.annotation.HeaderlessTable;
 
-@HeaderlessTable(value = "2015")
+@HeaderlessTable(value = "valid")
 public class DuplicatedColumnNameHeaderlessClass {
 
 	@Column("a")
